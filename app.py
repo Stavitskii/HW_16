@@ -1,12 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
+import time
 import datetime
 
 import data
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mybase.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
@@ -40,7 +41,7 @@ class Offer(db.Model):
     order_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     executor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-
+db.drop_all()
 db.create_all()
 
 
@@ -53,5 +54,23 @@ for user in data.USERS:
         email=user['email'],
         role=user['role'],
         phone=user['phone']
+    ))
+    db.session.commit()
+
+for order in data.ORDERS:
+#    date_obj_start_list = order['start_date'].split("/")
+#    date_obj_start = datetime.date(year=date_obj_start_list[2], month=date_obj_start_list[0],day=date_obj_start_list[1])
+    month_start, day_start, year_start = [int(_) for _ in order['start_date'].split("/")]
+    month_end, day_end, year_end = [int(_) for _ in order['end_date'].split("/")]
+    db.session.add(Order(
+        id=order['id'],
+        name=order['name'] ,
+        description=order['description'] ,
+        start_date=datetime.date(year=year_start, month=month_start,day=day_start),
+        end_date=datetime.date(year=year_end, month=month_end,day=day_end),
+        address=order['address'],
+        price=order['price'],
+        customer_id=order['customer_id'],
+        executor_id=order['executor_id']
     ))
     db.session.commit()
