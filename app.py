@@ -74,3 +74,12 @@ for order in data.ORDERS:
         executor_id=order['executor_id']
     ))
     db.session.commit()
+
+db.session.add_all([Offer(id=offer['id'], order_id=offer['order_id'], executor_id=offer['executor_id']) for offer in data.OFFERS])
+#for offer in data.OFFERS:
+#    db.session.add(Offer(
+#        id=offer['id'],
+#        order_id=offer['order_id'],
+#        executor_id=offer['executor_id']
+#    ))
+db.session.commit()
